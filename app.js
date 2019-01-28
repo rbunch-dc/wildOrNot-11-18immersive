@@ -24,8 +24,11 @@ app.set('view engine','ejs');
 app.use(express.static('public'));
 
 app.get('/',(req, res, next)=>{
-    res.render('index',{});
-})
+    const animalQuery = `SELECT * FROM animals;`;
+    connection.query(animalQuery,(error,results)=>{
+        res.render('index',{animals: results});
+    });
+});
 
 console.log("App is listening on port 8282");
 app.listen(8282);
