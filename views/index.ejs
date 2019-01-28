@@ -1,6 +1,31 @@
-<% animals.forEach((animal)=>{ %>
-    <div>
-        <img src="/<%= animal.image%>" />
-    </div>
+<% //animals.forEach((animal)=>{ %>
+<% //}) %>
 
-<% }) %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <% include header %>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3 text-center">
+                <h3><%= animal.species %></h3>
+                <img src="/<%= animal.image%>" />
+                <a href="/vote/domestic/<%=animal.id%>">
+                    <button class="btn btn-success">Domestic</button>
+                </a>
+                <a href="/vote/wild/<%=animal.id%>">
+                    <button class="btn btn-danger">Wild</button>
+                </a>
+            </div>
+        </div>
+    </div>    
+</body>
+</html>
+
+

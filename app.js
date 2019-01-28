@@ -26,9 +26,36 @@ app.use(express.static('public'));
 app.get('/',(req, res, next)=>{
     const animalQuery = `SELECT * FROM animals;`;
     connection.query(animalQuery,(error,results)=>{
-        res.render('index',{animals: results});
+        if(error){throw error}
+        // resuilts is an array of all rows in animals.
+        // grab a random one
+        const rand = Math.floor(Math.random() * results.length);
+        res.render('index',{animal: results[rand]});
     });
 });
 
-console.log("App is listening on port 8282");
-app.listen(8282);
+// espn wildcard example:
+// http://www.espn.com/nfl/team/_/name/ne/new-england-patriots
+// app.get('/nfl/team/_/name/:city/:team',(req, res)=>{
+    // query db, get the info from team WHERE team = req.params.city
+// })
+
+// add a new route to handle the votes
+// /vote/wild/1
+// /vote/domestic/3
+// /vote/up/ninja
+app.get('/vote/:value/:id',(req, res)=>{
+    const value = req.params.value;
+    const id  = req.params.id;
+    const insertQuery = `INSERT INTO votes (id,aid,value)
+        VALUES 
+    (DEFAULT,?,?);`;
+    connection.query(insertQuery,[id,value],(error,results)=>{
+        if (error) {throw error;}
+        res.redirect('/');
+    })
+    
+})
+
+console.log("App is listening on port 8902");
+app.listen(8902);
