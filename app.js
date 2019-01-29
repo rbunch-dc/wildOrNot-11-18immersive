@@ -66,9 +66,17 @@ app.get('/',(req, res, next)=>{
     if(!req.session.loggedIn){
         res.redirect('/login?msg=mustLogin');
     }else{
-
-        const animalQuery = `SELECT * FROM animals;`;
-        connection.query(animalQuery,(error,results)=>{
+        // we want all rows in animals
+        // that don't have an id in the votes table
+        // a perfect use case for a subquery!
+        // subquery, is a query inside a query
+        // we are going to get a list of all votes this use has
+        // then we are going to take that list, and check it against 
+        // the list of animals
+        const animalQuery = `SELECT * FROM animals WHERE id NOT IN(
+            SELECT aid FROM votes WHERE uid = ?
+        );`;
+        connection.query(animalQuery,[req.session.uid],(error,results)=>{
             if(error){throw error}
             
             // see if there is anything in the query string for msg
@@ -82,11 +90,20 @@ app.get('/',(req, res, next)=>{
 
             // results is an array of all rows in animals.
             // grab a random one
-            const rand = Math.floor(Math.random() * results.length);
-            res.render('index',{
-                animal: results[rand],
-                msg
-            });
+            if(results.length === 0){
+                // user has voted on all animals.
+                res.render('index',{
+                    animal: null,
+                    msg: `You have voted on all the animals! Please upload a new one, 
+                    or check out the <a href="/standings">standings</a> page.`
+                });
+            }else{
+                const rand = Math.floor(Math.random() * results.length);
+                res.render('index',{
+                    animal: results[rand],
+                    msg
+                });    
+            }
         })
     };
 });
