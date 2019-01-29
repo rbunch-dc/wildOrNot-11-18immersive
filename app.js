@@ -94,7 +94,11 @@ app.get('/vote/:value/:id',(req, res)=>{
 })
 
 app.get('/register',(req, res)=>{
-    res.render('register',{})
+    let msg;
+    if(req.query.msg == 'register'){
+        msg = 'This email adress is already registered.';
+    }
+    res.render('register',{msg})
 })
 
 app.post('/registerProcess',(req, res, next)=>{
@@ -123,6 +127,40 @@ app.post('/registerProcess',(req, res, next)=>{
         }
     })
 })
+
+app.get('/login', (req, res, next)=>{
+	res.render('login',{});
+});
+
+app.post('/loginProcess',(req, res, next)=>{
+    // res.json(req.body);
+    const email =  req.body.email;
+    // this is the English version of the password the user submitted
+    const password = req.body.password;
+    // we now need to get the hashed version from the DB, and compare!
+    const checkPasswordQuery = `SELECT * FROM users WHERE email = ?`;
+    connection.query(checkPasswordQuery,[email],(error, results)=>{
+        if(error){throw error;}
+        // possiblities:
+        // 1. No match. I.e., the user isnt not in the database.
+        if(results.length == 0 ){
+            // we dont care what password they gave us. Send them back to /login
+            res.redirect('/?msg=noUser');
+        }else{
+            // User exists...
+            // 2. We found the user, but password doesnt match
+            const passwordsMatch = bcrypt.compareSync(password,results[0].hash);
+            if(!passwordsMatch){
+                // goodbye.
+                res.redirect('/login?msg=badPass');
+            }else{
+                // 3. We found the user and the password matchs
+                // these are the droids we're looking for!!
+                res.redirect('/?msg=loginSuccess');
+            }
+        }
+    })
+});
 
 console.log("App is listening on port 8902");
 app.listen(8902);
