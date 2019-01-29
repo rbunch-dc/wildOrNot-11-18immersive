@@ -49,8 +49,6 @@ app.get('/standings',(req,res,next)=>{
         if(error){throw error;}
         res.render('standings',{results});
     })
-
-
 });
 
 // espn wildcard example:
