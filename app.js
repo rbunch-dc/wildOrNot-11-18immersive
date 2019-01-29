@@ -65,29 +65,30 @@ app.get('/',(req, res, next)=>{
     // if not: goodbye.
     if(!req.session.loggedIn){
         res.redirect('/login?msg=mustLogin');
-    }
+    }else{
 
-    const animalQuery = `SELECT * FROM animals;`;
-    connection.query(animalQuery,(error,results)=>{
-        if(error){throw error}
-        
-        // see if there is anything in the query string for msg
-        let msg;
-        if(req.query.msg == 'regSuccess'){
-            msg = 'You have successfully registered!';
-            console.log(msg);
-        }else if(req.query.msg == 'loginSuccess'){
-            msg = 'You have successfully logged in!';
-        }
+        const animalQuery = `SELECT * FROM animals;`;
+        connection.query(animalQuery,(error,results)=>{
+            if(error){throw error}
+            
+            // see if there is anything in the query string for msg
+            let msg;
+            if(req.query.msg == 'regSuccess'){
+                msg = 'You have successfully registered!';
+                console.log(msg);
+            }else if(req.query.msg == 'loginSuccess'){
+                msg = 'You have successfully logged in!';
+            }
 
-        // results is an array of all rows in animals.
-        // grab a random one
-        const rand = Math.floor(Math.random() * results.length);
-        res.render('index',{
-            animal: results[rand],
-            msg
-        });
-    });
+            // results is an array of all rows in animals.
+            // grab a random one
+            const rand = Math.floor(Math.random() * results.length);
+            res.render('index',{
+                animal: results[rand],
+                msg
+            });
+        })
+    };
 });
 
 app.get('/standings',(req,res,next)=>{
@@ -208,6 +209,8 @@ app.post('/loginProcess',(req, res, next)=>{
                 console.log(results[0].id)
                 req.session.name = results[0].name;
                 req.session.email = results[0].email;
+                // id is a reserved keyword in session. Don't mess with it.
+                // change id --> uid
                 req.session.uid = results[0].id;
                 req.session.loggedIn = true;
                 res.redirect('/?msg=loginSuccess');
