@@ -34,6 +34,25 @@ app.get('/',(req, res, next)=>{
     });
 });
 
+app.get('/standings',(req,res,next)=>{
+    // this is a specific SQL query to only get the data
+    // that you want to JS
+    const selectQuery = `SELECT SUM(IF(value='domestic',1,-1)) AS domesticCount, MAX(animals.species) FROM votes 
+    INNER JOIN animals ON votes.aid = animals.id
+    GROUP BY animals.species;` 
+
+    // const giveMeAllTheDataAndJSWillFIgureItOut = `
+    //     SELECT * FROM votes 
+    //     INNER JOIN animals ON votes.aid = animals.id
+    // `
+    connection.query(selectQuery,(error,results)=>{
+        if(error){throw error;}
+        res.render('standings',results);
+    })
+
+
+});
+
 // espn wildcard example:
 // http://www.espn.com/nfl/team/_/name/ne/new-england-patriots
 // app.get('/nfl/team/_/name/:city/:team',(req, res)=>{
@@ -44,13 +63,15 @@ app.get('/',(req, res, next)=>{
 // /vote/wild/1
 // /vote/domestic/3
 // /vote/up/ninja
+// /vote/up -- NOT
+// /vote/wild/3/ha -- NOT
 app.get('/vote/:value/:id',(req, res)=>{
     const value = req.params.value;
-    const id  = req.params.id;
+    const aid  = req.params.id;
     const insertQuery = `INSERT INTO votes (id,aid,value)
         VALUES 
     (DEFAULT,?,?);`;
-    connection.query(insertQuery,[id,value],(error,results)=>{
+    connection.query(insertQuery,[aid,value],(error,results)=>{
         if (error) {throw error;}
         res.redirect('/');
     })
