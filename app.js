@@ -37,7 +37,7 @@ app.get('/',(req, res, next)=>{
 app.get('/standings',(req,res,next)=>{
     // this is a specific SQL query to only get the data
     // that you want to JS
-    const selectQuery = `SELECT SUM(IF(value='domestic',1,-1)) AS domesticCount, MAX(animals.species) FROM votes 
+    const selectQuery = `SELECT SUM(IF(value='domestic',1,-1)) AS domesticCount, MAX(animals.species) as species FROM votes 
     INNER JOIN animals ON votes.aid = animals.id
     GROUP BY animals.species;` 
 
@@ -47,7 +47,7 @@ app.get('/standings',(req,res,next)=>{
     // `
     connection.query(selectQuery,(error,results)=>{
         if(error){throw error;}
-        res.render('standings',results);
+        res.render('standings',{results});
     })
 
 

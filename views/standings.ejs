@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -12,7 +12,13 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-6 col-sm-offset-3">
-                
+                <h2>How domestic is each animal?</h2>
+                <% results.forEach((animal)=>{ %>
+                    <div class="species-name">
+                        <%= animal.species %>
+                        <%= animal.domesticCount %>
+                    </div>
+                <% }) %>
             </div>
         </div>
     </div>
