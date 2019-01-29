@@ -122,10 +122,10 @@ app.get('/standings',(req,res,next)=>{
 app.get('/vote/:value/:id',(req, res)=>{
     const value = req.params.value;
     const aid  = req.params.id;
-    const insertQuery = `INSERT INTO votes (id,aid,value)
+    const insertQuery = `INSERT INTO votes (id,aid,value,uid)
         VALUES 
-    (DEFAULT,?,?);`;
-    connection.query(insertQuery,[aid,value],(error,results)=>{
+    (DEFAULT,?,?,?);`;
+    connection.query(insertQuery,[aid,value,req.session.uid],(error,results)=>{
         if (error) {throw error;}
         res.redirect('/');
     })    
@@ -205,9 +205,10 @@ app.post('/loginProcess',(req, res, next)=>{
                 // Cookies: Stores data in the browser, with a key on the server
                 // every single page request the entire cookie is sent to the server
                 // Sessions: Stores data on the server, with a key (cookie) on the browser
+                console.log(results[0].id)
                 req.session.name = results[0].name;
                 req.session.email = results[0].email;
-                req.session.id = results[0].id;
+                req.session.uid = results[0].id;
                 req.session.loggedIn = true;
                 res.redirect('/?msg=loginSuccess');
                 // response is set. HTTP disconnects.
