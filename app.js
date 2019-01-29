@@ -145,7 +145,7 @@ app.post('/loginProcess',(req, res, next)=>{
         // 1. No match. I.e., the user isnt not in the database.
         if(results.length == 0 ){
             // we dont care what password they gave us. Send them back to /login
-            res.redirect('/?msg=noUser');
+            res.redirect('/login?msg=noUser');
         }else{
             // User exists...
             // 2. We found the user, but password doesnt match
