@@ -40,9 +40,11 @@ app.get('/',(req, res, next)=>{
         if(req.query.msg == 'regSuccess'){
             msg = 'You have successfully registered!';
             console.log(msg);
+        }else if(req.query.msg == 'loginSuccess'){
+            msg = 'You have successfully logged in!';
         }
 
-        // resuilts is an array of all rows in animals.
+        // results is an array of all rows in animals.
         // grab a random one
         const rand = Math.floor(Math.random() * results.length);
         res.render('index',{
@@ -129,7 +131,13 @@ app.post('/registerProcess',(req, res, next)=>{
 })
 
 app.get('/login', (req, res, next)=>{
-	res.render('login',{});
+    let msg;
+    if(req.query.msg == 'noUser'){
+        msg = '<h2 class="text-danger">This email is not registered in our system. Please try again or register!</h2>'
+    }else if(req.query.msg == 'badPass'){
+        msg = '<h2 class="text-warning">This password is not associated with this email. Please enter again</h2>'
+    }
+	res.render('login',{msg});
 });
 
 app.post('/loginProcess',(req, res, next)=>{
