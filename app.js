@@ -34,10 +34,21 @@ app.get('/',(req, res, next)=>{
     const animalQuery = `SELECT * FROM animals;`;
     connection.query(animalQuery,(error,results)=>{
         if(error){throw error}
+        
+        // see if there is anything in the query string for msg
+        let msg;
+        if(req.query.msg == 'regSuccess'){
+            msg = 'You have successfully registered!';
+            console.log(msg);
+        }
+
         // resuilts is an array of all rows in animals.
         // grab a random one
         const rand = Math.floor(Math.random() * results.length);
-        res.render('index',{animal: results[rand]});
+        res.render('index',{
+            animal: results[rand],
+            msg
+        });
     });
 });
 
@@ -101,10 +112,16 @@ app.post('/registerProcess',(req, res, next)=>{
             // our query returned a row, that means this email is already registered
             res.redirect('/register?msg=register');
         }else{
-
+            // this is a new user! Insert them!
+            const insertUserQuery = `INSERT INTO users (name, email, hash)
+                VALUES
+            (?,?,?)`;
+            connection.query(insertUserQuery,[req.body.name, req.body.email, hashedPass],(error2, results2)=>{
+                if(error2){throw error2;}
+                res.redirect('/?msg=regSuccess');
+            })
         }
     })
-
 })
 
 console.log("App is listening on port 8902");
