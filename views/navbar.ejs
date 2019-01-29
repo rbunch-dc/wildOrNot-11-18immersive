@@ -7,14 +7,14 @@
                 <li class="active"><a href="/">Home</a></li>
     
             <!-- If the user is logged in, welcome them -->
-            
-                <li><a href="#">Welcome!</a></li>
+            <% if(loggedIn){ %>
+                <li><a href="#">Welcome, <%= name %>!</a></li>
                 <li class=""><a href="/logout">Logout</a></li>
-    
+            <% }else{ %>
             <!-- if the user isn't logged in, show teh register and login page -->
                 <li class="reg-link"><a href="/register">Register</a></li>
                 <li class="login-link"><a href="/login">Login</a></li>
-    
+            <% } %>
                 <li><a href="/standings">Standings</a></li>
             </ul>
         </div>

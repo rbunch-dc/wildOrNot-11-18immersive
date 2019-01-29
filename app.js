@@ -40,8 +40,27 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-app.get('/',(req, res, next)=>{
+// Define some middleware, if the user is logged in, 
+// then send the user data over to the view
+app.use('*',(req, res, next)=>{
+    // console.log("Middleware is working!");
+    if(req.session.loggedIn){
+        // res.locals is the variable that gets sent to the view
+        res.locals.name = req.session.name;
+        res.locals.id = req.session.id;
+        res.locals.email = req.session.email;
+        res.locals.loggedIn = true;
+    }else{
+        res.locals.name = "";
+        res.locals.id = "";
+        res.locals.email = "";
+        res.locals.loggedIn = false;
+    }
+    next();
+})
 
+
+app.get('/',(req, res, next)=>{
     // check to see if the user is loggedIn
     // if not: goodbye.
     if(!req.session.loggedIn){
