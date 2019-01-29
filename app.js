@@ -23,6 +23,12 @@ app.set('view engine','ejs');
 // set up our public folder
 app.use(express.static('public'));
 
+// we need the body parser and urlencode middleware
+// so we can get data from post requests!
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
 app.get('/',(req, res, next)=>{
     const animalQuery = `SELECT * FROM animals;`;
     connection.query(animalQuery,(error,results)=>{
@@ -72,8 +78,15 @@ app.get('/vote/:value/:id',(req, res)=>{
     connection.query(insertQuery,[aid,value],(error,results)=>{
         if (error) {throw error;}
         res.redirect('/');
-    })
-    
+    })    
+})
+
+app.get('/register',(req, res)=>{
+    res.render('register',{})
+})
+
+app.post('/registerProcess',(req, res, next)=>{
+    res.json(req.body);
 })
 
 console.log("App is listening on port 8902");
