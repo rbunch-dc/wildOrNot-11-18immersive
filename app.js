@@ -6,14 +6,24 @@ const express = require('express');
 let app = express();
 // put our helmet on!
 const bcrypt = require('bcrypt-nodejs');
+const expressSession = require('express-session');
 const helmet = require('helmet');
+const config = require('./config');
 // app.use means, add some middleware!
 // middelware = any function that has access to req and res
 app.use(helmet());
 
+const sessionOptions = {
+  secret: config.sessionSecret,
+  resave: false,
+  saveUninitialized: true,
+//   cookie: { secure: true }
+};
+
+app.use(expressSession(sessionOptions));
+
 // Set up Mysql Connection
 const mysql = require('mysql');
-const config = require('./config');
 let connection = mysql.createConnection(config.db);
 // we have a connection, let's connect!
 connection.connect();
@@ -31,6 +41,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/',(req, res, next)=>{
+
+    // check to see if the user is loggedIn
+    // if not: goodbye.
+    if(!req.session.loggedIn){
+        res.redirect('/login?msg=mustLogin');
+    }
+
     const animalQuery = `SELECT * FROM animals;`;
     connection.query(animalQuery,(error,results)=>{
         if(error){throw error}
@@ -164,11 +181,28 @@ app.post('/loginProcess',(req, res, next)=>{
             }else{
                 // 3. We found the user and the password matchs
                 // these are the droids we're looking for!!
+                // -NOTE: every single http request (route) is a completely
+                // new request. 
+                // Cookies: Stores data in the browser, with a key on the server
+                // every single page request the entire cookie is sent to the server
+                // Sessions: Stores data on the server, with a key (cookie) on the browser
+                req.session.name = results[0].name;
+                req.session.email = results[0].email;
+                req.session.id = results[0].id;
+                req.session.loggedIn = true;
                 res.redirect('/?msg=loginSuccess');
+                // response is set. HTTP disconnects.
+                // we are done
             }
         }
     })
 });
+
+app.get('/logout',(req, res, next)=>{
+    // delete all session varibles for this user
+    req.session.destroy();
+    res.redirect('/login?msg=loggedOut')
+})
 
 console.log("App is listening on port 8902");
 app.listen(8902);
