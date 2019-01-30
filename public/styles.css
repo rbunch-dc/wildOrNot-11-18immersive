@@ -2,3 +2,7 @@ img{
     /* max-width: 600px; */
     height: 500px;
 }
+
+.standings-link{
+    color: #31708f !important;
+}

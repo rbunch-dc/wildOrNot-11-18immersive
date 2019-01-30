@@ -1,5 +1,7 @@
 // Dum,Dum,Dum... no generator!!
 // First, well, this is an Express app. Maybe we should
+const fs = require('fs');
+
 // get... Express
 const express = require('express');
 // Make an express app
@@ -12,6 +14,10 @@ const config = require('./config');
 // app.use means, add some middleware!
 // middelware = any function that has access to req and res
 app.use(helmet());
+
+const multer = require('multer');
+const upload = multer({ dest: 'public/' })
+
 
 const sessionOptions = {
   secret: config.sessionSecret,
@@ -95,7 +101,7 @@ app.get('/',(req, res, next)=>{
                 res.render('index',{
                     animal: null,
                     msg: `You have voted on all the animals! Please upload a new one, 
-                    or check out the <a href="/standings">standings</a> page.`
+                    or check out the <a style="color: #31708f;" href="/standings">standings</a> page.`
                 });
             }else{
                 const rand = Math.floor(Math.random() * results.length);
@@ -244,5 +250,25 @@ app.get('/logout',(req, res, next)=>{
     res.redirect('/login?msg=loggedOut')
 })
 
+app.get('/uploadAnimal',(req, res)=>{
+    res.render('upload',{});
+})
+
+app.post('/formSubmit',upload.single('imageToUpload'),(req, res)=>{
+    // get the animal name from req.body ... ???
+    // get the image form... ???
+    // res.json(req.file);
+
+    // the file is here in req.file. But, it's in binary.
+    // 1. get the temp path / location of our file on this server
+    // 2. set up the new target path / where we actually want it
+    // (i.e., original name might be usefull here ...)
+    // 3. we can't read binary... but fs can! Have fs read that sucker
+    // 4. Once binary is read, write it to target
+    // 5. Insert the name of the file into the db
+    // 6. Send them to /
+
+});
+
 console.log("App is listening on port 8902");
-app.listen(8902);
+app.listen(8903);

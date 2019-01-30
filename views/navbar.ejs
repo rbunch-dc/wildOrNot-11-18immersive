@@ -10,6 +10,12 @@
             <% if(loggedIn){ %>
                 <li><a href="#">Welcome, <%= name %>!</a></li>
                 <li class=""><a href="/logout">Logout</a></li>
+                <li>
+                    <a href="/uploadAnimal">
+                        <button class="btn btn-success">Upload animal</button>
+                    </a>
+                </li>
+
             <% }else{ %>
             <!-- if the user isn't logged in, show teh register and login page -->
                 <li class="reg-link"><a href="/register">Register</a></li>
