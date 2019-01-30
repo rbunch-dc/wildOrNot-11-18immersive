@@ -261,11 +261,34 @@ app.post('/formSubmit',upload.single('imageToUpload'),(req, res)=>{
 
     // the file is here in req.file. But, it's in binary.
     // 1. get the temp path / location of our file on this server
+    const tmpPath = req.file.path;
     // 2. set up the new target path / where we actually want it
     // (i.e., original name might be usefull here ...)
+    const targetPath = `public/${req.file.originalname}`
     // 3. we can't read binary... but fs can! Have fs read that sucker
-    // 4. Once binary is read, write it to target
-    // 5. Insert the name of the file into the db
+    fs.readFile(tmpPath,(error,fileContents)=>{
+        if(error){throw error};
+        // 4. Once binary is read, write it to target
+        fs.writeFile(targetPath,fileContents,(error2)=>{
+            if(error2){throw error2};
+            // 5. Insert the name of the file into the db
+            const insertQuery = `INSERT INTO animals (id,species,image)
+                VALUES
+            (DEFAULT,?,?);`;
+            connection.query(
+                insertQuery,
+                [req.body.animalName,req.file.originalname],
+                (dbError,dbResults)=>
+            {
+                if(dbError){
+                    throw dbError;
+                }else{
+                    fs.unlink(tmpPath);
+                    res.redirect('/');
+                }
+            })
+        });
+    });
     // 6. Send them to /
 
 });
